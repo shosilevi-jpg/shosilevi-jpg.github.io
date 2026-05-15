@@ -1,1 +1,0 @@
-# shosilevi-jpg.github.io
