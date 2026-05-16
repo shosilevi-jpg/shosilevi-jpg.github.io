@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Serene Shopping</title>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<style>
+:root{--navy:#1A5276;--navy-dark:#0f3352;--navy-light:#2471a3;--green:#1e8449;--green-light:#27ae60;--gold:#b7950b;--gold-light:#d4ac0d;--cream:#fdfcf8;--gray-100:#f4f6f8;--gray-200:#e8ecef;--gray-400:#aab4be;--gray-600:#6b7a8a;--gray-800:#2c3e50;--shadow-sm:0 2px 8px rgba(26,82,118,.08);--shadow-md:0 4px 20px rgba(26,82,118,.13);--shadow-lg:0 8px 40px rgba(26,82,118,.18);--radius:14px;--radius-sm:8px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Public Sans',sans-serif;background:var(--cream);color:var(--gray-800);min-height:100vh;direction:rtl}
+
+/* LOGIN */
+#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--navy-dark) 0%,var(--navy) 55%,var(--navy-light) 100%)}
+.login-box{background:white;border-radius:20px;padding:44px 40px;width:100%;max-width:440px;box-shadow:var(--shadow-lg);text-align:center}
+.login-logo{font-size:44px;margin-bottom:10px}
+.login-title{font-size:26px;font-weight:800;color:var(--navy);margin-bottom:4px}
+.login-sub{font-size:14px;color:var(--gray-600);margin-bottom:28px}
+.login-section-title{font-size:12px;font-weight:700;color:var(--gray-600);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;text-align:right}
+.login-users-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:14px;max-height:180px;overflow-y:auto;padding:2px}
+.login-user-btn{background:var(--gray-100);border:2px solid transparent;border-radius:var(--radius-sm);padding:8px 6px;cursor:pointer;font-family:'Public Sans',sans-serif;font-size:13px;font-weight:600;color:var(--navy);transition:all .18s;text-align:center}
+.login-user-btn:hover{border-color:var(--navy-light);background:#eaf2fb}
+.login-user-btn.selected{border-color:var(--navy);background:#eaf2fb}
+.pin-input{width:100%;border:2px solid var(--gray-200);border-radius:var(--radius-sm);padding:11px 14px;font-family:'Public Sans',sans-serif;font-size:20px;letter-spacing:8px;text-align:center;transition:border-color .2s;margin-top:10px}
+.pin-input:focus{outline:none;border-color:var(--navy)}
+.login-btn{padding:12px 28px;color:white;border:none;border-radius:var(--radius-sm);font-family:'Public Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;width:100%;margin-top:10px}
+.login-btn.navy{background:var(--navy)}.login-btn.navy:hover{background:var(--navy-dark)}
+.login-btn.green{background:var(--green)}.login-btn.green:hover{background:var(--green-light)}
+.login-divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--gray-400);font-size:13px}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--gray-200)}
+.login-error{color:#c0392b;font-size:13px;margin-top:8px;padding:8px 12px;background:#fdf0ef;border-radius:6px;display:none}
+.login-error.show{display:block}
+
+/* HEADER */
+header{background:linear-gradient(135deg,var(--navy-dark) 0%,var(--navy) 60%,var(--navy-light) 100%);padding:0 32px;height:68px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 16px rgba(15,51,82,.35);position:sticky;top:0;z-index:100}
+.header-brand{display:flex;align-items:center;gap:12px}
+.header-logo{width:38px;height:38px;background:rgba(255,255,255,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid rgba(255,255,255,.25)}
+.header-title{color:white;font-size:20px;font-weight:700}
+.header-sub{color:rgba(255,255,255,.6);font-size:12px;margin-top:1px}
+.header-right{display:flex;align-items:center;gap:10px}
+.header-badge{background:rgba(255,255,255,.18);color:white;padding:5px 14px;border-radius:20px;font-size:13px;font-weight:600}
+.header-logout{background:rgba(255,255,255,.12);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.2);border-radius:var(--radius-sm);padding:6px 14px;font-size:13px;cursor:pointer;font-family:'Public Sans',sans-serif;transition:all .2s}
+.header-logout:hover{background:rgba(255,255,255,.22);color:white}
+
+/* LAYOUT */
+#appScreen{display:none}
+.main-wrap{max-width:1140px;margin:0 auto;padding:32px 20px}
+.view{display:none}.view.active{display:block}
+
+/* CARD */
+.card{background:white;border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:28px;border:1px solid var(--gray-200)}
+.section-title{font-size:22px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.section-sub{color:var(--gray-600);font-size:14px;margin-bottom:24px}
+
+/* APARTMENT GRID */
+.apartment-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:28px}
+.apt-card{background:var(--gray-100);border:2px solid transparent;border-radius:var(--radius-sm);padding:16px;cursor:pointer;transition:all .2s;text-align:center}
+.apt-card:hover{border-color:var(--navy-light);background:white}
+.apt-card.selected{border-color:var(--navy);background:#eaf2fb}
+.apt-icon{font-size:26px;margin-bottom:6px}
+.apt-name{font-weight:600;color:var(--navy);font-size:15px}
+.apt-addr{font-size:11px;color:var(--gray-600);margin-top:3px}
+.apt-card.done-badge::after{content:'✔ הוגש';display:inline-block;background:var(--green);color:white;font-size:10px;border-radius:20px;padding:2px 8px;margin-top:6px}
+
+/* PRODUCTS */
+.products-form{display:none}.products-form.active{display:block}
+.apt-header-bar{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(90deg,var(--navy) 0%,var(--navy-light) 100%);color:white;padding:16px 22px;border-radius:var(--radius-sm);margin-bottom:22px}
+.apt-header-bar h2{font-size:18px;font-weight:700}
+.apt-header-bar p{font-size:13px;opacity:.8;margin-top:2px}
+.cat-block{margin-bottom:24px}
+.cat-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gold);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid var(--gray-200)}
+.product-row{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid var(--gray-200);gap:12px}
+.product-row:last-child{border-bottom:none}
+.product-name{flex:1;font-size:15px}
+.qty-ctrl{display:flex;align-items:center;gap:8px;background:var(--gray-100);border-radius:30px;padding:4px 10px}
+.qty-btn{width:28px;height:28px;border-radius:50%;border:none;cursor:pointer;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.qty-btn.minus{background:var(--gray-200);color:var(--gray-600)}
+.qty-btn.plus{background:var(--navy);color:white}
+.qty-btn:hover{transform:scale(1.1)}
+.qty-display{min-width:28px;text-align:center;font-weight:700;font-size:16px;color:var(--navy)}
+.note-input{border:1px solid var(--gray-200);border-radius:6px;padding:5px 10px;font-family:'Public Sans',sans-serif;font-size:13px;color:var(--gray-800);width:150px;transition:border-color .2s}
+.note-input:focus{outline:none;border-color:var(--navy-light)}
+.add-item-row{display:flex;align-items:center;gap:8px;padding:10px 0 4px;margin-top:4px}
+.add-item-input{flex:1;border:1.5px dashed var(--gray-400);border-radius:6px;padding:7px 12px;font-family:'Public Sans',sans-serif;font-size:14px;color:var(--gray-800);background:var(--gray-100);transition:all .2s}
+.add-item-input:focus{outline:none;border-color:var(--navy-light);border-style:solid;background:white}
+.add-item-input::placeholder{color:var(--gray-400)}
+.btn-add-item{padding:7px 16px;background:var(--navy);color:white;border:none;border-radius:6px;font-family:'Public Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .18s;white-space:nowrap}
+.btn-add-item:hover{background:var(--navy-dark)}
+.custom-badge{font-size:10px;background:#eaf2fb;color:var(--navy);border-radius:20px;padding:2px 7px;font-weight:600;margin-right:4px}
+.btn-remove-item{background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:16px;padding:2px 4px;border-radius:4px;transition:color .15s}
+.btn-remove-item:hover{color:#c0392b}
+.submit-bar{display:flex;justify-content:flex-start;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid var(--gray-200)}
+
+/* BUTTONS */
+.btn{padding:10px 24px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-family:'Public Sans',sans-serif;font-size:14px;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:7px}
+.btn-primary{background:var(--navy);color:white}.btn-primary:hover{background:var(--navy-dark);transform:translateY(-1px)}
+.btn-green{background:var(--green);color:white}.btn-green:hover{background:var(--green-light)}
+.btn-gold{background:var(--gold);color:white}.btn-gold:hover{background:var(--gold-light)}
+.btn-outline{background:transparent;border:2px solid var(--navy);color:var(--navy)}.btn-outline:hover{background:var(--navy);color:white}
+.btn-danger{background:#c0392b;color:white}.btn-danger:hover{background:#e74c3c}
+.btn-wa{background:#25D366;color:white}.btn-wa:hover{background:#1ebe59}
+.btn-sm{padding:6px 14px;font-size:13px}
+.btn-xs{padding:4px 10px;font-size:12px}
+
+/* MANAGER */
+.manager-tabs{display:flex;background:var(--gray-100);border-radius:var(--radius-sm);padding:4px;width:fit-content;margin-bottom:24px}
+.mtab{padding:9px 20px;border-radius:6px;cursor:pointer;font-size:14px;font-weight:500;color:var(--gray-600);transition:all .2s;border:none;background:transparent;font-family:'Public Sans',sans-serif}
+.mtab.active{background:white;color:var(--navy);font-weight:700;box-shadow:var(--shadow-sm)}
+
+/* TABLE */
+.summary-table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--navy);color:white;padding:10px 12px;font-weight:600;white-space:nowrap;text-align:center}
+th:first-child{text-align:right}
+td{padding:9px 12px;border-bottom:1px solid var(--gray-200);text-align:center}
+td:first-child{text-align:right;font-weight:500}
+tr:nth-child(even) td{background:var(--gray-100)}
+.cell-has{color:var(--green);font-weight:700}
+.cell-note{font-size:11px;color:var(--gold)}
+.total-row td{background:#eaf2fb !important;font-weight:700;color:var(--navy)}
+
+/* FORMS */
+.email-row{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.email-input{flex:1;min-width:220px;border:2px solid var(--gray-200);border-radius:var(--radius-sm);padding:10px 14px;font-family:'Public Sans',sans-serif;font-size:14px;transition:border-color .2s}
+.email-input:focus{outline:none;border-color:var(--navy)}
+.form-row{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.form-row label{font-size:13px;font-weight:600;color:var(--gray-600)}
+.form-input{border:2px solid var(--gray-200);border-radius:var(--radius-sm);padding:9px 14px;font-family:'Public Sans',sans-serif;font-size:14px;transition:border-color .2s}
+.form-input:focus{outline:none;border-color:var(--navy)}
+.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-select{border:2px solid var(--gray-200);border-radius:var(--radius-sm);padding:9px 14px;font-family:'Public Sans',sans-serif;font-size:14px;min-height:100px}
+.form-select:focus{outline:none;border-color:var(--navy)}
+
+/* STAFF */
+.staff-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.staff-card{background:var(--gray-100);border-radius:var(--radius-sm);padding:16px;border:1px solid transparent;transition:border-color .2s}
+.staff-card:hover{border-color:var(--gray-200)}
+.staff-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
+.staff-name{font-weight:700;font-size:15px;color:var(--navy)}
+.staff-apts{font-size:12px;color:var(--gray-600);margin-top:2px}
+.staff-details{font-size:12px;color:var(--gray-600);display:flex;flex-direction:column;gap:3px}
+.staff-actions{display:flex;gap:6px;flex-shrink:0}
+
+/* APARTMENTS MGMT */
+.apts-mgmt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.apt-mgmt-card{background:var(--gray-100);border-radius:var(--radius-sm);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.apt-mgmt-name{font-weight:700;font-size:15px;color:var(--navy)}
+.apt-mgmt-addr{font-size:12px;color:var(--gray-600);margin-top:2px}
+
+/* PROGRESS */
+.progress-wrap{display:flex;align-items:center;gap:12px;background:var(--gray-100);border-radius:var(--radius-sm);padding:14px 20px;margin-bottom:20px}
+.progress-bar-bg{flex:1;height:8px;background:var(--gray-200);border-radius:20px;overflow:hidden}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--green-light));border-radius:20px;transition:width .5s ease}
+.progress-text{font-size:13px;color:var(--gray-600);white-space:nowrap}
+
+/* TOAST */
+#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--navy-dark);color:white;padding:12px 28px;border-radius:30px;font-size:14px;font-weight:500;box-shadow:var(--shadow-lg);transition:transform .3s ease;z-index:999}
+#toast.show{transform:translateX(-50%) translateY(0)}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,51,82,.45);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-box{background:white;border-radius:var(--radius);padding:30px;max-width:500px;width:94%;box-shadow:var(--shadow-lg)}
+.modal-box h3{font-size:18px;color:var(--navy);margin-bottom:16px}
+.modal-btns{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+
+/* REMINDER */
+.reminder-banner{display:flex;align-items:center;gap:14px;background:linear-gradient(90deg,#eaf2fb,#d6eaf8);border:1px solid #aed6f1;border-radius:var(--radius-sm);padding:14px 18px;margin-bottom:22px;font-size:14px;color:var(--navy)}
+
+/* CUSTOM PRODS */
+.custom-prod-tag{display:inline-flex;align-items:center;gap:6px;background:var(--gray-100);border:1px solid var(--gray-200);border-radius:20px;padding:5px 14px;font-size:13px}
+
+@media(max-width:600px){
+  header{padding:0 14px}.main-wrap{padding:18px 10px}
+  .note-input{width:90px}.header-title{font-size:16px}
+  .form-grid-2{grid-template-columns:1fr}
+  .login-users-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">🛒</div>
+    <div class="login-title">Serene Shopping</div>
+    <div class="login-sub">ניהול קניות — דיור מוגן</div>
+
+    <div class="login-section-title">בחר/י משתמש</div>
+    <div class="login-users-grid" id="loginUsersGrid"></div>
+
+    <input type="password" class="pin-input" id="loginPin" maxlength="6" placeholder="• • • •" inputmode="numeric">
+    <div class="login-error" id="loginError">קוד שגוי. נסה/י שוב.</div>
+    <button class="login-btn navy" onclick="doLogin()">כניסה →</button>
+
+    <div class="login-divider">כניסה מהירה למנהלת</div>
+    <input type="password" class="pin-input" id="managerPin" maxlength="6" placeholder="• • • •" inputmode="numeric" style="margin-bottom:0">
+    <button class="login-btn green" onclick="doManagerLogin()" style="margin-top:8px">🏢 כניסה כמנהלת →</button>
+  </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div id="toast"></div>
+
+<!-- ===== MODALS ===== -->
+<!-- Reset -->
+<div class="modal-overlay" id="resetModal">
+  <div class="modal-box">
+    <h3>⚠️ איפוס כמויות שבועי</h3>
+    <p style="color:var(--gray-600);font-size:14px">פעולה זו תאפס את כל הכמויות וההערות ל-0. המוצרים המותאמים הקבועים יישמרו. האם להמשיך?</p>
+    <div class="modal-btns">
+      <button class="btn btn-outline" onclick="closeModal('resetModal')">ביטול</button>
+      <button class="btn btn-danger" onclick="confirmReset()">✓ אפס כמויות</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Staff -->
+<div class="modal-overlay" id="staffModal">
+  <div class="modal-box">
+    <h3 id="staffModalTitle">✏️ עריכת מדריך</h3>
+    <input type="hidden" id="staffModalIdx">
+    <div class="form-grid-2">
+      <div class="form-row"><label>שם מלא *</label><input class="form-input" id="sfName" placeholder="שם מדריך..."></div>
+      <div class="form-row"><label>קוד כניסה (PIN) *</label><input class="form-input" id="sfPin" placeholder="4-6 ספרות..." maxlength="6" inputmode="numeric"></div>
+      <div class="form-row"><label>טלפון</label><input class="form-input" id="sfPhone" placeholder="05X-XXXXXXX" type="tel"></div>
+      <div class="form-row"><label>אימייל</label><input class="form-input" id="sfEmail" placeholder="name@email.com" type="email"></div>
+      <div class="form-row" style="grid-column:1/-1"><label>כתובת מגורים</label><input class="form-input" id="sfAddress" placeholder="רחוב, עיר..."></div>
+    </div>
+    <div class="form-row"><label>דירות משויכות (ניתן לבחור מספר)</label><select class="form-select" id="sfApts" multiple></select></div>
+    <div class="modal-btns">
+      <button class="btn btn-outline" onclick="closeModal('staffModal')">ביטול</button>
+      <button class="btn btn-primary" onclick="saveStaff()">💾 שמור</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Apartment -->
+<div class="modal-overlay" id="aptModal">
+  <div class="modal-box">
+    <h3>🏠 עריכת פרטי דירה</h3>
+    <input type="hidden" id="aptModalId">
+    <div class="form-row"><label>שם דירה *</label><input class="form-input" id="aptModalName" placeholder="שם הדירה..."></div>
+    <div class="form-row"><label>כתובת למשלוח</label><input class="form-input" id="aptModalAddr" placeholder="רחוב, מספר, קומה..."></div>
+    <div class="modal-btns">
+      <button class="btn btn-outline" onclick="closeModal('aptModal')">ביטול</button>
+      <button class="btn btn-primary" onclick="saveApt()">💾 שמור</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== APP ===== -->
+<div id="appScreen">
+  <header>
+    <div class="header-brand">
+      <div class="header-logo">🛒</div>
+      <div><div class="header-title">Serene Shopping</div><div class="header-sub">ניהול קניות — דיור מוגן</div></div>
+    </div>
+    <div class="header-right">
+      <span class="header-badge" id="headerBadge"></span>
+      <button class="header-logout" onclick="logout()">יציאה ↩</button>
+    </div>
+  </header>
+
+  <!-- GUIDE VIEW -->
+  <div id="view-guide" class="view">
+  <div class="main-wrap"><div class="card">
+    <div class="section-title" id="guideGreeting">שלום! 👋</div>
+    <div class="section-sub">בחר/י את הדירה שלך ועדכן/י את החוסרים לשבוע הקרוב.</div>
+    <div class="reminder-banner"><span style="font-size:22px">🔔</span><span>תזכורת: עדכון חוסרים כל יום שלישי עד 14:00.</span></div>
+    <div class="apartment-grid" id="aptGrid"></div>
+    <div class="products-form" id="productsForm" style="margin-top:0">
+      <div class="apt-header-bar">
+        <div><h2 id="formAptName">—</h2><p id="formAptAddr">—</p></div>
+        <button class="btn btn-outline" style="border-color:rgba(255,255,255,.5);color:white" onclick="closeForm()">✕ חזור</button>
+      </div>
+      <div id="productsList"></div>
+      <div class="submit-bar">
+        <button class="btn btn-green" onclick="submitApt()">✓ אישור סיום — הגשת רשימה</button>
+        <button class="btn btn-outline btn-sm" onclick="closeForm()">ביטול</button>
+      </div>
+    </div>
+  </div></div>
+  </div>
+
+  <!-- MANAGER VIEW -->
+  <div id="view-manager" class="view">
+  <div class="main-wrap"><div class="card">
+    <div class="section-title">ממשק מנהלת 🏢</div>
+    <div class="section-sub">ריכוז הזמנות, ייצוא ושליחה לספקים</div>
+    <div class="progress-wrap">
+      <span style="font-size:13px;font-weight:600;color:var(--navy)">התקדמות:</span>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+      <span class="progress-text" id="progressText">0 / 7 דירות</span>
+    </div>
+    <div class="manager-tabs">
+      <button class="mtab active" onclick="switchMTab('summary',this)">📊 ריכוז הזמנות</button>
+      <button class="mtab" onclick="switchMTab('staff',this)">👥 ניהול צוות</button>
+      <button class="mtab" onclick="switchMTab('apartments',this)">🏠 ניהול דירות</button>
+    </div>
+
+    <!-- SUMMARY -->
+    <div id="mtab-summary">
+      <div class="email-row">
+        <input type="email" class="email-input" id="supplierEmail" placeholder="📧 כתובת מייל ספק...">
+        <button class="btn btn-primary" onclick="sendEmail()">📤 שלח במייל</button>
+        <button class="btn btn-gold" onclick="exportPDF()">📄 ייצוא PDF</button>
+        <button class="btn btn-danger" onclick="openModal('resetModal')">🔄 סיום ועדכון מלאי</button>
+      </div>
+      <div class="summary-table-wrap" id="summaryTableWrap"></div>
+      <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--gray-200)">
+        <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:12px">🛒 מוצרים מותאמים קבועים</div>
+        <div id="customProdsMgmt" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+        <div id="customProdsEmpty" style="font-size:13px;color:var(--gray-400)">אין מוצרים מותאמים קבועים עדיין.</div>
+      </div>
+    </div>
+
+    <!-- STAFF -->
+    <div id="mtab-staff" style="display:none">
+      <div style="margin-bottom:16px"><button class="btn btn-primary" onclick="openNewStaff()">+ הוסף מדריך חדש</button></div>
+      <div class="staff-grid" id="staffGrid"></div>
+    </div>
+
+    <!-- APARTMENTS -->
+    <div id="mtab-apartments" style="display:none">
+      <p style="font-size:14px;color:var(--gray-600);margin-bottom:16px">לחץ/י על ✏️ לעריכת שם וכתובת של כל דירה.</p>
+      <div class="apts-mgmt-grid" id="aptsMgmtGrid"></div>
+    </div>
+  </div></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DEFAULTS
+// ============================================================
+const DEFAULT_APARTMENTS = [
+  {id:'katif',      name:'קטיף',       addr:'רחוב השקד 10, קומה 1',       icon:'🏠'},
+  {id:'ariel',      name:'אריאל שרון', addr:"רחוב התמר 5, כניסה ב'",      icon:'🏡'},
+  {id:'limonit',    name:'לימונית',    addr:'רחוב הגפן 2, אגף דרומי',     icon:'🌿'},
+  {id:'henry',      name:'הנרי קנדל',  addr:'רחוב הזית 8, קומה 2',        icon:'🏘'},
+  {id:'nahalyamin', name:'נחל ימין',   addr:'רחוב הרימון 12, דירה 4',     icon:'🌊'},
+  {id:'nahalboqeq', name:'נחל בוקק',  addr:'רחוב התאנה 3, קומת קרקע',   icon:'💧'},
+  {id:'shaarha',    name:'שער הגיא',   addr:"רחוב האלון 1, כניסה א'",     icon:'🌳'},
+];
+
+const CATEGORIES = {
+  'מוצרי חלב':     ['חלב 3%','גבינה לבנה 5%',"קוטג'",'יוגורט טבעי','חמאה','גבינה צהובה'],
+  'מוצרי ניקיון':  ['נוזל כלים','מרכך כביסה','אבקת כביסה','חומר לניקוי רצפות','מטליות לניקוי כללי','סבון כלים'],
+  'היגיינה אישית': ['נייר טואלט','סבון נוזלי לידיים','שמפו','משחת שיניים','מברשות שיניים','נייר מגבת'],
+};
+const BASE_PRODUCTS = Object.values(CATEGORIES).flat();
+
+const MANAGER_PIN = '2881';
+
+const DEFAULT_STAFF = [
+  {name:'חיים',   pin:'1111', apts:['katif','ariel'],      phone:'', email:'', address:''},
+  {name:'טוהר',   pin:'2222', apts:['limonit'],            phone:'', email:'', address:''},
+  {name:'מיכל',   pin:'3333', apts:['henry'],              phone:'', email:'', address:''},
+  {name:'לאה',    pin:'4444', apts:['nahalyamin'],         phone:'', email:'', address:''},
+  {name:'מזל',    pin:'5555', apts:['nahalboqeq'],        phone:'', email:'', address:''},
+  {name:'אחוה',   pin:'6666', apts:['shaarha'],            phone:'', email:'', address:''},
+  {name:'קלריסה', pin:'7777', apts:['katif'],              phone:'', email:'', address:''},
+  {name:'פלורי',  pin:'8888', apts:['ariel'],              phone:'', email:'', address:''},
+  {name:'רונית',  pin:'9999', apts:['limonit','henry'],    phone:'', email:'', address:''},
+  {name:'עופר',   pin:'1234', apts:['nahalyamin'],         phone:'', email:'', address:''},
+  {name:'שריה',   pin:'2345', apts:['nahalboqeq'],        phone:'', email:'', address:''},
+  {name:'פריאל',  pin:'3456', apts:['shaarha'],            phone:'', email:'', address:''},
+  {name:'אילנית', pin:'4567', apts:['katif'],              phone:'', email:'', address:''},
+];
+
+// ============================================================
+// LOCALSTORAGE — persist everything
+// ============================================================
+const LS = {
+  KEY: 'serene_v3',
+  save(data) {
+    try { localStorage.setItem(this.KEY, JSON.stringify(data)); } catch(e) {}
+  },
+  load() {
+    try { const d = localStorage.getItem(this.KEY); return d ? JSON.parse(d) : null; } catch(e) { return null; }
+  }
+};
+
+function buildFreshState() {
+  const quantities = {}, notes = {}, submitted = {}, customProducts = {};
+  DEFAULT_APARTMENTS.forEach(a => {
+    quantities[a.id] = {}; notes[a.id] = {}; customProducts[a.id] = {};
+    BASE_PRODUCTS.forEach(p => { quantities[a.id][p] = 0; notes[a.id][p] = ''; });
+    submitted[a.id] = false;
+  });
+  return {
+    apartments: JSON.parse(JSON.stringify(DEFAULT_APARTMENTS)),
+    staff: JSON.parse(JSON.stringify(DEFAULT_STAFF)),
+    quantities, notes, submitted, customProducts
+  };
+}
+
+// Load persisted state or build fresh
+let S = LS.load() || buildFreshState();
+
+// Ensure any new apartments from DEFAULT that don't exist in saved state are added
+DEFAULT_APARTMENTS.forEach(da => {
+  if (!S.apartments.find(a => a.id === da.id)) S.apartments.push({...da});
+  if (!S.quantities[da.id]) { S.quantities[da.id] = {}; S.notes[da.id] = {}; S.customProducts[da.id] = {}; S.submitted[da.id] = false; }
+});
+
+function persist() { LS.save(S); }
+
+// ============================================================
+// SESSION (not persisted — login state only)
+// ============================================================
+let session = { user: null }; // {name, role, apts, idx}
+
+// ============================================================
+// LOGIN
+// ============================================================
+let selectedIdx = null;
+
+function buildLoginGrid() {
+  const grid = document.getElementById('loginUsersGrid');
+  grid.innerHTML = S.staff.map((s,i) =>
+    `<button class="login-user-btn" onclick="selectUser(${i},this)">${s.name}</button>`
+  ).join('');
+  selectedIdx = null;
+}
+
+function selectUser(i, btn) {
+  selectedIdx = i;
+  document.querySelectorAll('.login-user-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('loginPin').focus();
+  document.getElementById('loginError').classList.remove('show');
+}
+
+function doLogin() {
+  if (selectedIdx === null) { showLoginError('אנא בחר/י משתמש'); return; }
+  const pin = document.getElementById('loginPin').value.trim();
+  const s = S.staff[selectedIdx];
+  if (pin !== s.pin) { showLoginError('קוד שגוי. נסה/י שוב.'); return; }
+  enterApp({name:s.name, role:'guide', apts:s.apts, idx:selectedIdx});
+}
+
+function doManagerLogin() {
+  const pin = document.getElementById('managerPin').value.trim();
+  if (pin !== MANAGER_PIN) { showLoginError('קוד מנהלת שגוי.'); return; }
+  enterApp({name:'מנהלת', role:'manager', apts:[]});
+}
+
+function showLoginError(msg) {
+  const el = document.getElementById('loginError');
+  el.textContent = msg; el.classList.add('show');
+}
+
+function enterApp(user) {
+  session.user = user;
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appScreen').style.display = 'block';
+  document.getElementById('headerBadge').textContent = '👤 ' + user.name;
+  document.getElementById('loginPin').value = '';
+  document.getElementById('managerPin').value = '';
+  document.getElementById('loginError').classList.remove('show');
+  if (user.role === 'manager') { showView('manager'); renderManager(); }
+  else { showView('guide'); document.getElementById('guideGreeting').textContent = 'שלום, ' + user.name + '! 👋'; renderAptGrid(); }
+}
+
+function logout() {
+  session.user = null; selectedIdx = null;
+  document.getElementById('appScreen').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  buildLoginGrid();
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+function showView(v) {
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-' + v).classList.add('active');
+}
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function switchMTab(t, btn) {
+  document.querySelectorAll('.mtab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  ['summary','staff','apartments'].forEach(id =>
+    document.getElementById('mtab-'+id).style.display = id===t?'':'none');
+  if (t==='staff') renderStaff();
+  if (t==='apartments') renderAptsMgmt();
+}
+function prodKey(p) { return btoa(unescape(encodeURIComponent(p))).replace(/[^a-zA-Z0-9]/g,''); }
+function keyToProd(aptId, key) { return getAllProds(aptId).find(p => prodKey(p)===key)||null; }
+function getAllProds(aptId) { return [...BASE_PRODUCTS, ...Object.keys(S.customProducts[aptId]||{})]; }
+
+// ============================================================
+// GUIDE — APARTMENT GRID
+// ============================================================
+function renderAptGrid() {
+  const user = session.user;
+  const apts = user.role==='manager' ? S.apartments : S.apartments.filter(a => user.apts.includes(a.id));
+  const grid = document.getElementById('aptGrid');
+  grid.innerHTML = apts.map(a => `
+    <div class="apt-card ${S.submitted[a.id]?'done-badge':''}" onclick="selectApt('${a.id}')">
+      <div class="apt-icon">${a.icon}</div>
+      <div class="apt-name">${a.name}</div>
+      <div class="apt-addr">${a.addr}</div>
+    </div>`).join('');
+}
+
+function selectApt(id) {
+  const apt = S.apartments.find(a=>a.id===id);
+  document.getElementById('formAptName').textContent = apt.name;
+  document.getElementById('formAptAddr').textContent = apt.addr;
+  renderProducts(id);
+  document.getElementById('productsForm').classList.add('active');
+  document.getElementById('aptGrid').style.display = 'none';
+  document.getElementById('productsForm').scrollIntoView({behavior:'smooth'});
+}
+
+function closeForm() {
+  document.getElementById('productsForm').classList.remove('active');
+  document.getElementById('aptGrid').style.display = '';
+  renderAptGrid();
+}
+
+// ============================================================
+// PRODUCTS
+// ============================================================
+function renderProductRow(aptId, p, isCustom) {
+  const qty = S.quantities[aptId][p]||0, note = S.notes[aptId][p]||'', key = prodKey(p);
+  return `<div class="product-row">
+    <div class="product-name">${p}${isCustom?'<span class="custom-badge">מותאם</span>':''}</div>
+    <div class="qty-ctrl">
+      <button class="qty-btn minus" data-apt="${aptId}" data-prod="${key}" data-delta="-1">−</button>
+      <span class="qty-display" id="qty_${aptId}_${key}">${qty}</span>
+      <button class="qty-btn plus"  data-apt="${aptId}" data-prod="${key}" data-delta="1">+</button>
+    </div>
+    <input class="note-input" type="text" placeholder="הערה..." value="${note}" data-apt="${aptId}" data-prod="${key}">
+    ${isCustom?`<button class="btn-remove-item" data-apt="${aptId}" data-prod="${key}">✕</button>`:''}
+  </div>`;
+}
+
+function renderProducts(aptId) {
+  if (!S.customProducts[aptId]) S.customProducts[aptId]={};
+  let html='';
+  Object.entries(CATEGORIES).forEach(([cat, prods]) => {
+    html += `<div class="cat-block"><div class="cat-title">${cat}</div>`;
+    prods.forEach(p => { html += renderProductRow(aptId, p, false); });
+    Object.keys(S.customProducts[aptId]).filter(k=>S.customProducts[aptId][k]===cat)
+      .forEach(p => { html += renderProductRow(aptId, p, true); });
+    const ck = prodKey(cat);
+    html += `<div class="add-item-row">
+      <input class="add-item-input" type="text" placeholder="+ הוסף פריט לקטגוריה זו..." id="ni_${aptId}_${ck}">
+      <button class="btn-add-item" data-apt="${aptId}" data-cat="${cat}" data-ck="${ck}">הוסף</button>
+    </div></div>`;
+  });
+  document.getElementById('productsList').innerHTML = html;
+  attachListeners(aptId);
+}
+
+function attachListeners(aptId) {
+  const list = document.getElementById('productsList');
+  list.querySelectorAll('.qty-btn').forEach(btn => btn.addEventListener('click', () => {
+    const prod = keyToProd(aptId, btn.dataset.prod); if (!prod) return;
+    S.quantities[aptId][prod] = Math.max(0,(S.quantities[aptId][prod]||0)+parseInt(btn.dataset.delta));
+    const el = document.getElementById('qty_'+aptId+'_'+btn.dataset.prod);
+    if (el) el.textContent = S.quantities[aptId][prod];
+    persist();
+  }));
+  list.querySelectorAll('.note-input').forEach(inp => inp.addEventListener('input', () => {
+    const prod = keyToProd(aptId, inp.dataset.prod); if (prod) { S.notes[aptId][prod]=inp.value; persist(); }
+  }));
+  list.querySelectorAll('.btn-remove-item').forEach(btn => btn.addEventListener('click', () => {
+    const prod = keyToProd(aptId, btn.dataset.prod); if (!prod) return;
+    if (!confirm('למחוק את "'+prod+'" לצמיתות מכל הדירות?')) return;
+    S.apartments.forEach(a => {
+      delete S.customProducts[a.id][prod];
+      delete S.quantities[a.id][prod];
+      delete S.notes[a.id][prod];
+    });
+    persist(); renderProducts(aptId); showToast('🗑 הפריט נמחק מכל הדירות');
+  }));
+  list.querySelectorAll('.btn-add-item').forEach(btn => btn.addEventListener('click', () => {
+    const cat=btn.dataset.cat, ck=btn.dataset.ck;
+    const inp = document.getElementById('ni_'+aptId+'_'+ck);
+    const name = inp.value.trim();
+    if (!name) { showToast('⚠️ הכנס/י שם פריט'); return; }
+    if (getAllProds(aptId).includes(name)) { showToast('⚠️ הפריט כבר קיים'); return; }
+    // Add permanently to ALL apartments
+    S.apartments.forEach(a => {
+      if (!S.customProducts[a.id]) S.customProducts[a.id]={};
+      S.customProducts[a.id][name] = cat;
+      if (S.quantities[a.id][name]===undefined) S.quantities[a.id][name]=0;
+      if (S.notes[a.id][name]===undefined) S.notes[a.id][name]='';
+    });
+    inp.value=''; persist(); renderProducts(aptId); showToast('✅ הפריט נוסף לכל הדירות: '+name);
+  }));
+  list.querySelectorAll('.add-item-input').forEach(inp =>
+    inp.addEventListener('keydown', e => { if (e.key==='Enter') inp.nextElementSibling.click(); }));
+}
+
+// selectApt (with aptId stored on element)
+function selectApt(id) {
+  const apt = S.apartments.find(a=>a.id===id);
+  document.getElementById('formAptName').textContent = apt.name;
+  document.getElementById('formAptAddr').textContent = apt.addr;
+  document.getElementById('formAptName').dataset.aptid = id;
+  renderProducts(id);
+  document.getElementById('productsForm').classList.add('active');
+  document.getElementById('aptGrid').style.display = 'none';
+  document.getElementById('productsForm').scrollIntoView({behavior:'smooth'});
+}
+function submitApt() {
+  const id = document.getElementById('formAptName').dataset.aptid; if (!id) return;
+  S.submitted[id] = true; persist();
+  showToast('✅ רשימת '+S.apartments.find(a=>a.id===id).name+' הוגשה!');
+  closeForm();
+}
+
+// ============================================================
+// MANAGER
+// ============================================================
+function renderManager() { renderSummaryTable(); renderProgress(); renderCustomProdsMgmt(); }
+
+function renderProgress() {
+  const done = S.apartments.filter(a=>S.submitted[a.id]).length;
+  const pct = Math.round(done/S.apartments.length*100);
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressText').textContent=done+' / '+S.apartments.length+' דירות';
+}
+
+function renderSummaryTable() {
+  const customAll={};
+  S.apartments.forEach(a => Object.entries(S.customProducts[a.id]||{}).forEach(([p,cat]) => {
+    if(!customAll[cat]) customAll[cat]=new Set(); customAll[cat].add(p);
+  }));
+  let html='<table><thead><tr><th>מוצר</th>';
+  S.apartments.forEach(a => html+=`<th>${a.name}${S.submitted[a.id]?' ✔':''}</th>`);
+  html+='<th>סה"כ</th></tr></thead><tbody>';
+  Object.entries(CATEGORIES).forEach(([cat,prods]) => {
+    html+=`<tr><td colspan="${S.apartments.length+2}" style="background:#eaf2fb;font-weight:700;color:var(--navy);font-size:12px;text-transform:uppercase;letter-spacing:.5px;padding:8px 12px">${cat}</td></tr>`;
+    [...prods,...(customAll[cat]?[...customAll[cat]]:[])].forEach(p => {
+      let total=0; html+=`<tr><td>${p}</td>`;
+      S.apartments.forEach(a => {
+        const q=S.quantities[a.id][p]||0, n=S.notes[a.id][p]||''; total+=q;
+        html+=`<td>${q>0?`<span class="cell-has">${q}</span>`:'<span style="color:var(--gray-400)">—</span>'}${n?`<div class="cell-note">${n}</div>`:''}</td>`;
+      });
+      html+=`<td class="cell-has">${total>0?total:'—'}</td></tr>`;
+    });
+  });
+  html+='<tr class="total-row"><td>סה"כ פריטים</td>';
+  S.apartments.forEach(a => { const t=getAllProds(a.id).reduce((s,p)=>s+(S.quantities[a.id][p]||0),0); html+=`<td>${t}</td>`; });
+  const grand=S.apartments.reduce((s,a)=>s+getAllProds(a.id).reduce((ss,p)=>ss+(S.quantities[a.id][p]||0),0),0);
+  html+=`<td>${grand}</td></tr></tbody></table>`;
+  document.getElementById('summaryTableWrap').innerHTML=html;
+}
+
+function renderCustomProdsMgmt() {
+  const allCustom={};
+  S.apartments.forEach(a => Object.entries(S.customProducts[a.id]||{}).forEach(([p,cat]) => { allCustom[p]=cat; }));
+  const keys=Object.keys(allCustom);
+  const container=document.getElementById('customProdsMgmt');
+  const empty=document.getElementById('customProdsEmpty');
+  if (!container) return;
+  empty.style.display=keys.length?'none':'';
+  container.innerHTML=keys.map(p=>`
+    <div class="custom-prod-tag">
+      <span style="color:var(--navy);font-weight:600">${p}</span>
+      <span style="color:var(--gray-400);font-size:11px">${allCustom[p]}</span>
+      <button onclick="deleteCustomGlobal(this,'${p.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}');"
+        style="background:none;border:none;cursor:pointer;color:#c0392b;font-size:14px;padding:0 2px">✕</button>
+    </div>`).join('');
+}
+
+function deleteCustomGlobal(btn, prod) {
+  if (!confirm('למחוק את "'+prod+'" לצמיתות מכל הדירות?')) return;
+  S.apartments.forEach(a => { delete S.customProducts[a.id][prod]; delete S.quantities[a.id][prod]; delete S.notes[a.id][prod]; });
+  persist(); renderCustomProdsMgmt(); renderSummaryTable(); showToast('🗑 "'+prod+'" נמחק לצמיתות');
+}
+
+function confirmReset() {
+  S.apartments.forEach(a => {
+    getAllProds(a.id).forEach(p => { S.quantities[a.id][p]=0; S.notes[a.id][p]=''; });
+    S.submitted[a.id]=false;
+  });
+  persist(); closeModal('resetModal'); renderManager(); showToast('✅ כמויות אופסו — מוצרים קבועים נשמרו');
+}
+
+function sendEmail() {
+  const email=document.getElementById('supplierEmail').value.trim();
+  if (!email) { showToast('⚠️ אנא הכנס/י כתובת מייל'); return; }
+  let body='הזמנה שבועית — Serene Shopping\n\n';
+  S.apartments.forEach(a => {
+    body+=`\n🏠 ${a.name} (${a.addr})\n${'—'.repeat(30)}\n`;
+    getAllProds(a.id).forEach(p => { const q=S.quantities[a.id][p]||0; if(q>0) body+=`  • ${p}: ${q}${S.notes[a.id][p]?' ('+S.notes[a.id][p]+')':''}\n`; });
+  });
+  window.open(`mailto:${email}?subject=${encodeURIComponent('הזמנה שבועית — Serene Shopping')}&body=${encodeURIComponent(body)}`);
+  showToast('📤 פתיחת תוכנת מייל...');
+}
+
+function exportPDF() {
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'p',unit:'mm',format:'a4'});
+  S.apartments.forEach((apt,idx) => {
+    if(idx>0) doc.addPage();
+    doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(26,82,118);
+    doc.text('Serene Shopping',105,18,{align:'center'});
+    doc.setFontSize(14); doc.setTextColor(44,62,80); doc.text(apt.name,190,28,{align:'right'});
+    doc.setFontSize(10); doc.setFont('helvetica','normal'); doc.setTextColor(107,122,138);
+    doc.text(apt.addr,190,35,{align:'right'});
+    doc.setDrawColor(26,82,118); doc.setLineWidth(0.5); doc.line(15,40,195,40);
+    const rows=[];
+    getAllProds(apt.id).forEach(p => { const q=S.quantities[apt.id][p]||0; if(q>0) rows.push([p,q,S.notes[apt.id][p]||'']); });
+    if(!rows.length) { doc.setFontSize(12); doc.setTextColor(170,180,190); doc.text('אין חוסרים לדירה זו השבוע',105,60,{align:'center'}); }
+    else { doc.autoTable({startY:44,head:[['מוצר','כמות','הערה']],body:rows,styles:{font:'helvetica',fontSize:11,halign:'right'},headStyles:{fillColor:[26,82,118],textColor:255,fontStyle:'bold'},alternateRowStyles:{fillColor:[244,246,248]},margin:{right:15,left:15}}); }
+    doc.setFontSize(9); doc.setTextColor(170,180,190);
+    doc.text(`הופק: ${new Date().toLocaleDateString('he-IL')} | Serene Shopping`,105,287,{align:'center'});
+  });
+  doc.save('serene-shopping-order.pdf');
+  showToast('📄 PDF הופק בהצלחה!');
+}
+
+// ============================================================
+// STAFF
+// ============================================================
+function renderStaff() {
+  document.getElementById('staffGrid').innerHTML = S.staff.map((s,i) => {
+    const aptNames = s.apts.map(id=>S.apartments.find(a=>a.id===id)?.name||id).join(', ')||'ללא שיוך';
+    return `<div class="staff-card">
+      <div class="staff-card-top">
+        <div><div class="staff-name">👤 ${s.name}</div><div class="staff-apts">📍 ${aptNames}</div></div>
+        <div class="staff-actions">
+          <a class="btn btn-wa btn-xs" href="https://wa.me/${s.phone.replace(/\D/g,'')}?text=${encodeURIComponent('שלום '+s.name+', תזכורת: עדכן/י חוסרים 🛒')}" target="_blank">💬 WA</a>
+          <button class="btn btn-outline btn-xs" onclick="openEditStaff(${i})">✏️</button>
+          <button class="btn btn-danger btn-xs" onclick="removeStaff(${i})">✕</button>
+        </div>
+      </div>
+      <div class="staff-details">
+        ${s.phone?`<span>📞 ${s.phone}</span>`:''}
+        ${s.email?`<span>📧 ${s.email}</span>`:''}
+        ${s.address?`<span>🏠 ${s.address}</span>`:''}
+        <span style="color:var(--gray-400)">🔑 קוד: ${'•'.repeat(s.pin.length)}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function fillAptSelect(selectedApts) {
+  document.getElementById('sfApts').innerHTML = S.apartments.map(a =>
+    `<option value="${a.id}" ${selectedApts.includes(a.id)?'selected':''}>${a.name}</option>`).join('');
+}
+
+function openNewStaff() {
+  document.getElementById('staffModalTitle').textContent = '+ מדריך חדש';
+  document.getElementById('staffModalIdx').value = '';
+  ['sfName','sfPin','sfPhone','sfEmail','sfAddress'].forEach(id=>document.getElementById(id).value='');
+  fillAptSelect([]); openModal('staffModal');
+}
+
+function openEditStaff(i) {
+  const s=S.staff[i];
+  document.getElementById('staffModalTitle').textContent = '✏️ עריכת '+s.name;
+  document.getElementById('staffModalIdx').value = i;
+  document.getElementById('sfName').value    = s.name;
+  document.getElementById('sfPin').value     = s.pin;
+  document.getElementById('sfPhone').value   = s.phone||'';
+  document.getElementById('sfEmail').value   = s.email||'';
+  document.getElementById('sfAddress').value = s.address||'';
+  fillAptSelect(s.apts); openModal('staffModal');
+}
+
+function saveStaff() {
+  const name=document.getElementById('sfName').value.trim();
+  const pin=document.getElementById('sfPin').value.trim();
+  if (!name) { showToast('⚠️ שם חובה'); return; }
+  if (!pin)  { showToast('⚠️ קוד כניסה חובה'); return; }
+  const obj = {
+    name, pin,
+    phone:   document.getElementById('sfPhone').value.trim(),
+    email:   document.getElementById('sfEmail').value.trim(),
+    address: document.getElementById('sfAddress').value.trim(),
+    apts:    Array.from(document.getElementById('sfApts').selectedOptions).map(o=>o.value)
+  };
+  const idx = document.getElementById('staffModalIdx').value;
+  if (idx==='') S.staff.push(obj); else S.staff[parseInt(idx)]=obj;
+  persist(); closeModal('staffModal'); renderStaff(); buildLoginGrid(); showToast('✅ פרטי המדריך נשמרו');
+}
+
+function removeStaff(i) {
+  if (!confirm('האם למחוק את '+S.staff[i].name+'?')) return;
+  S.staff.splice(i,1); persist(); renderStaff(); buildLoginGrid(); showToast('🗑 מדריך הוסר');
+}
+
+// ============================================================
+// APARTMENTS MANAGEMENT
+// ============================================================
+function renderAptsMgmt() {
+  document.getElementById('aptsMgmtGrid').innerHTML = S.apartments.map(a=>`
+    <div class="apt-mgmt-card">
+      <div><div class="apt-mgmt-name">${a.icon} ${a.name}</div><div class="apt-mgmt-addr">${a.addr}</div></div>
+      <button class="btn btn-outline btn-sm" onclick="openEditApt('${a.id}')">✏️ עריכה</button>
+    </div>`).join('');
+}
+
+function openEditApt(id) {
+  const apt=S.apartments.find(a=>a.id===id);
+  document.getElementById('aptModalId').value   = id;
+  document.getElementById('aptModalName').value = apt.name;
+  document.getElementById('aptModalAddr').value = apt.addr;
+  openModal('aptModal');
+}
+
+function saveApt() {
+  const id=document.getElementById('aptModalId').value;
+  const name=document.getElementById('aptModalName').value.trim();
+  const addr=document.getElementById('aptModalAddr').value.trim();
+  if (!name) { showToast('⚠️ שם דירה חובה'); return; }
+  const apt=S.apartments.find(a=>a.id===id);
+  apt.name=name; apt.addr=addr;
+  persist(); closeModal('aptModal'); renderAptsMgmt(); renderSummaryTable(); showToast('✅ פרטי הדירה עודכנו');
+}
+
+// ============================================================
+// INIT
+// ============================================================
+buildLoginGrid();
+document.getElementById('loginPin').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('managerPin').addEventListener('keydown', e => { if(e.key==='Enter') doManagerLogin(); });
+</script>
+</body>
+</html>
